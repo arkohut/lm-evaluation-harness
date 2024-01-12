@@ -1,0 +1,30 @@
+group: 
+- ceval-valid_cot_fewshot
+dataset_path: ceval/ceval-exam
+validation_split: val
+fewshot_split: dev
+output_type: generate_until
+doc_to_choice: ["A", "B", "C", "D"]
+doc_to_target: "{{['A', 'B', 'C', 'D'].index(answer)}}"
+metric_list:
+  - metric: exact_match
+    aggregation: mean
+    higher_is_better: true
+generation_kwargs:
+  max_gen_toks: 1024
+  until:
+    - "</s>"
+    - "Q"
+    - "\n\n"
+    - "<|im_end|>"
+  do_sample: false
+  temperature: 0.0
+filter_list:
+  - name: "get-answer"
+    filter:
+      - function: "regex"
+        regex_pattern: "(?<=所以答案是)(.*)(?=。)"
+      - function: "take_first"
+num_fewshot: 5
+metadata:
+  version: 2.0
